@@ -41,15 +41,43 @@ LEFT JOIN public.manufacturers AS man
 SELECT prod.name, prod.price, man.name AS manufacturer_name
 FROM public.products AS prod
 LEFT JOIN public.manufacturers AS man
-    ON prod.manufacturer = man.code;
+  ON prod.manufacturer = man.code;
 -- 1.12 Select the average price of each manufacturer's products, showing only the manufacturer's code.
-SELECT AVG(prod.price), prod.manufacturer
-FROM public.products AS prod
+SELECT AVG(prod.price) as avg_price, prod.manufacturer
+FROM public.products as prod
+GROUP BY prod.manufacturer;
 -- 1.13 Select the average price of each manufacturer's products, showing the manufacturer's name.
+SELECT AVG(p.price) as avg_price, m.name
+FROM Products p join Manufacturers m 
+ON p.manufacturer = m.code
+GROUP BY m.name;
 -- 1.14 Select the names of manufacturer whose products have an average price larger than or equal to $150.
+SELECT AVG(p.price) as avg_price, m.name
+FROM Products p RIGHT JOIN Manufacturers m 
+ON p.manufacturer = m.code
+GROUP BY m.name
+HAVING AVG(p.price) >= 150;
+
 -- 1.15 Select the name and price of the cheapest product.
+SELECT name, price
+FROM Products
+WHERE Price = (SELECT MIN(price) FROM Products);
+
 -- 1.16 Select the name of each manufacturer along with the name and price of its most expensive product.
+
+
 -- 1.17 Add a new product: Loudspeakers, $70, manufacturer 2.
+SELECT * FROM Products
+
+INSERT INTO Products VALUES (11, 'Loudspeakers', 70, 2) 
 -- 1.18 Update the name of product 8 to "Laser Printer".
+UPDATE Products
+SET Name = 'Laser Printer'
+WHERE Code = 8;
 -- 1.19 Apply a 10% discount to all products.
+UPDATE Products
+SET Price = Price*0.9;
 -- 1.20 Apply a 10% discount to all products with a price larger than or equal to $120.
+UPDATE Products
+SET Price = Price*0.9
+WHERE Price >= 120;
