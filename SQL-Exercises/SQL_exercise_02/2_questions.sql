@@ -33,20 +33,64 @@ SELECT e.Name, e.LastName, d.Budget, e.Name
 FROM Employees e 
     FULL JOIN Departments d 
     ON e.Department = d.Code
+
 -- 2.12 Select the name and last name of employees working for departments with a budget greater than $60,000.
 SELECT e.Name, e.LastName
 FROM Employees e 
     FULL JOIN Departments d 
     ON e.Department = d.Code
 WHERE d.Budget > 60000
+
 -- 2.13 Select the departments with a budget larger than the average budget of all the departments.
+SELECT d.Name
+FROM Departments d 
+WHERE d.Budget > (SELECT AVG(Budget) FROM Departments)
 
 -- 2.14 Select the names of departments with more than two employees.
+SELECT d.Code, d.Name, COUNT(e.SSN) AS emp_count
+FROM Departments d
+    JOIN Employees e ON d.Code = e.Department
+GROUP BY d.Code
+HAVING COUNT(e.SSN) > 2
+
 -- 2.15 Very Important - Select the name and last name of employees working for departments with second lowest budget.
+
+SELECT e.LastName, e.Name
+FROM Departments d
+    JOIN Employees e ON d.Code = e.Department
+WHERE d.Budget = (
+    SELECT MIN(Budget)
+    FROM Departments
+    WHERE Budget > (SELECT MIN(Budget) 
+                    FROM Departments))
+
 -- 2.16  Add a new department called "Quality Assurance", with a budget of $40,000 and departmental code 11. 
+SELECT * FROM Departments
+
+INSERT INTO Departments values (11, 'Quality Assurance', 40000)
+
 -- And Add an employee called "Mary Moore" in that department, with SSN 847-21-9811.
+SELECT * FROM Employees
+
+INSERT INTO Employees values (847219811, 'Mary', 'Moore', 11)
+
 -- 2.17 Reduce the budget of all departments by 10%.
+UPDATE Departments SET Budget = Budget*0.9
+
 -- 2.18 Reassign all employees from the Research department (code 77) to the IT department (code 14).
+
+UPDATE Employees 
+SET Department = 14 
+WHERE Department = 77
 -- 2.19 Delete from the table all employees in the IT department (code 14).
+DELETE FROM Employees WHERE Department = 14
+
 -- 2.20 Delete from the table all employees who work in departments with a budget greater than or equal to $60,000.
+DELETE FROM Employees WHERE (
+    SELECT 
+    FROM Departments d
+    JOIN Employees e ON d.Code = e.Department
+    WHERE d.Budget >= 60000
+    )
+
 -- 2.21 Delete from the table all employees.
