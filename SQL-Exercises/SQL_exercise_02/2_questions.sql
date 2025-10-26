@@ -86,11 +86,11 @@ WHERE Department = 77
 DELETE FROM Employees WHERE Department = 14
 
 -- 2.20 Delete from the table all employees who work in departments with a budget greater than or equal to $60,000.
-DELETE FROM Employees WHERE (
-    SELECT 
+DELETE FROM Employees WHERE Department IN (
+    SELECT d.Code
     FROM Departments d
-    JOIN Employees e ON d.Code = e.Department
     WHERE d.Budget >= 60000
     )
 
 -- 2.21 Delete from the table all employees.
+DELETE FROM Employees
