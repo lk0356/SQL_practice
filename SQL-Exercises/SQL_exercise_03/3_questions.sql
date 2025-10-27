@@ -67,11 +67,33 @@ UPDATE Boxes SET Value = Value*0.85
 DELETE FROM Boxes WHERE value < 100
 
 -- 3.15 Remove all boxes from saturated warehouses.
-
+DELETE FROM Boxes b WHERE Warehouse IN (
+SELECT w.code
+FROM Warehouses w
+WHERE w.capacity < (
+    SELECT COUNT(*)
+    FROM Boxes b
+    WHERE w.code = b.warehouse
+    )
+)
 
 -- 3.16 Add Index for column "Warehouse" in table "boxes"
     -- !!!NOTE!!!: index should NOT be used on small tables in practice
+CREATE INDEX WAREHOUSE_INDEX ON Boxes (Warehouse)
+
 -- 3.17 Print all the existing indexes
     -- !!!NOTE!!!: index should NOT be used on small tables in practice
+SELECT
+    tablename,
+    indexname,
+    indexdef
+FROM
+    pg_indexes
+WHERE
+    schemaname = 'public'
+ORDER BY
+    tablename,
+    indexname;
 -- 3.18 Remove (drop) the index you added just
     -- !!!NOTE!!!: index should NOT be used on small tables in practice
+DROP INDEX WAREHOUSE_INDEX
