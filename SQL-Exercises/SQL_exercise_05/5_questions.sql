@@ -27,6 +27,9 @@ JOIN Provides
 ON Pieces.Code = Provides.Piece
 WHERE Provides.Provider = 'HAL'
 
+
+
+
 -- 5.6
 -- ---------------------------------------------
 -- !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
