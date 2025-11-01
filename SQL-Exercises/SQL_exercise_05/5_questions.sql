@@ -28,8 +28,6 @@ ON Pieces.Code = Provides.Piece
 WHERE Provides.Provider = 'HAL'
 
 
-
-
 -- 5.6
 -- ---------------------------------------------
 -- !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -37,10 +35,23 @@ WHERE Provides.Provider = 'HAL'
 -- For each piece, find the most expensive offering of that piece and include the piece name, provider name, and price 
 -- (note that there could be two providers who supply the same piece at the most expensive price).
 
+SELECT Pieces.Name, Providers.Name, Provides.Price
+FROM Pieces JOIN Provides ON Pieces.Code = Provides.Piece
+            JOIN Providers ON Provides.Provider = Providers.Code
+WHERE Provides.Price = (
+    SELECT MAX(Price) AS max_price
+    FROM Provides
+    WHERE Provides.Piece = Pieces.code
+)
 
 -- ---------------------------------------------
 -- 5.7 Add an entry to the database to indicate that "Skellington Supplies" (code "TNBC") will provide sprockets (code "1") for 7 cents each.
+INSERT INTO Provides values (1, 'TNBC', 7)
+
 -- 5.8 Increase all prices by one cent.
+UPDATE Provides SET Price = Price*1.01
+
 -- 5.9 Update the database to reflect that "Susan Calvin Corp." (code "RBT") will not supply bolts (code 4).
+
 -- 5.10 Update the database to reflect that "Susan Calvin Corp." (code "RBT") will not supply any pieces 
     -- (the provider should still remain in the database).
