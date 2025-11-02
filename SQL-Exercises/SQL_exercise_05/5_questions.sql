@@ -52,6 +52,8 @@ INSERT INTO Provides values (1, 'TNBC', 7)
 UPDATE Provides SET Price = Price*1.01
 
 -- 5.9 Update the database to reflect that "Susan Calvin Corp." (code "RBT") will not supply bolts (code 4).
+DELETE FROM Provides WHERE Provides.Provider = 'RBT' AND Provides.Piece = 4
 
 -- 5.10 Update the database to reflect that "Susan Calvin Corp." (code "RBT") will not supply any pieces 
     -- (the provider should still remain in the database).
+DELETE FROM Provides WHERE Provides.Provider = 'RBT'
