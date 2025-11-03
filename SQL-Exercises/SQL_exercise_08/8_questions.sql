@@ -39,16 +39,49 @@ ORDER BY p.Price DESC
 -- =====================
 
 -- 6. Show each order along with the customer’s full name and email.
+SELECT o.*, c.first_name, c.last_name, c.email
+FROM orders o
+    JOIN customers c
+        ON o.customer_id = c.customer_id
+
 -- 7. List all order items along with the product name and the customer who ordered them.
+SELECT oi.quantity, oi.unit_price, c.first_name, p.product_name
+FROM orders o
+    JOIN customers c
+        ON o.customer_id = c.customer_id
+    JOIN order_items oi
+        ON o.order_id = oi.order_id
+    JOIN products p
+        ON oi.product_id = p.product_id
+
 -- 8. Find all products that have never been ordered.
+SELECT * 
+FROM Products p
+WHERE p.product_id NOT IN (
+    SELECT oi.product_id 
+    FROM order_items oi
+    ) -- doesn't appear that there are any
+
 -- 9. Show all customers who have at least one cancelled order.
+SELECT o.order_id, c.first_name, c.last_name, o.status
+FROM orders o 
+    JOIN customers c
+        ON o.customer_id = c.customer_id
+WHERE o.status = 'Cancelled'
+
 -- 10. List each customer and how many total orders they’ve placed.
+SELECT COUNT(o.order_id) AS order_count, c.first_name, c.last_name
+FROM customers c
+    JOIN orders o
+        ON o.customer_id = c.customer_id
+GROUP BY c.customer_id
 
 -- =====================
 -- LEVEL 3 — Aggregations & Grouping
 -- =====================
 
 -- 11. Calculate the total revenue (sum of quantity × unit_price) per product.
+
 -- 12. Find the total amount spent by each customer across all their orders.
 -- 13. Determine the average order value (total per order).
 -- 14. Find the top 3 products by total sales revenue.
