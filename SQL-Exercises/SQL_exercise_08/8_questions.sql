@@ -81,8 +81,30 @@ GROUP BY c.customer_id
 -- =====================
 
 -- 11. Calculate the total revenue (sum of quantity × unit_price) per product.
+SELECT 
+    p.product_name, 
+    oi.unit_price*oi.quantity AS total_revenue, 
+    oi.quantity
+FROM order_items oi
+    JOIN products p
+        ON p.product_id = oi.product_id
+GROUP BY oi.product_id, oi.product_id, p.product_name, oi.quantity, oi.unit_price
+
+SELECT 
+    p.product_name,
+    SUM(oi.unit_price * oi.quantity) AS total_revenue,
+    SUM(oi.quantity) AS total_quantity
+FROM order_items oi
+JOIN products p
+    ON p.product_id = oi.product_id
+GROUP BY p.product_name;
+
+SELECT *
+FROM products
 
 -- 12. Find the total amount spent by each customer across all their orders.
+
+
 -- 13. Determine the average order value (total per order).
 -- 14. Find the top 3 products by total sales revenue.
 -- 15. For each country, calculate the total number of delivered orders and total revenue.
