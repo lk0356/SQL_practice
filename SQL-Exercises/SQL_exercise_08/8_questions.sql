@@ -165,8 +165,87 @@ GROUP BY shipping_country
 -- =====================
 
 -- 16. Find all customers whose total spend is above the average customer spend.
+-- customers join orders (will need to group by customer at the end)
+-- 
+WITH 
+    average_order_value AS 
+    (
+        SELECT AVG(ot.order_total) AS average_order_value
+        FROM (
+            SELECT SUM(quantity*unit_price) AS order_total
+            FROM order_items
+            GROUP BY order_id
+            ) AS ot
+    ),
+    order_values AS 
+    (
+        SELECT SUM(quantity*unit_price) AS order_total, order_id
+        FROM order_items
+        GROUP BY order_id
+    ),
+    orders_values AS 
+    (
+        SELECT
+            SUM(ov.order_total) as orders_total,
+            o.customer_id
+        FROM orders o
+            JOIN order_values ov
+                ON o.order_id = ov.order_id
+        GROUP BY o.customer_id
+    )
+
+SELECT 
+    osv.orders_total,
+    c.first_name,
+    c.last_name
+FROM orders_values osv
+    JOIN customers c
+        ON osv.customer_id = c.customer_id
+        CROSS JOIN average_order_value aov
+WHERE osv.orders_total > aov.average_order_value
+
+SELECT *
+FROM (
+    SELECT
+        c.customer_id,
+        c.first_name,
+        c.last_name,
+        SUM(oi.quantity * oi.unit_price) AS total_spent,
+        AVG(SUM(oi.quantity * oi.unit_price)) OVER() AS avg_spent
+    FROM customers c
+    JOIN orders o ON c.customer_id = o.customer_id
+    JOIN order_items oi ON o.order_id = oi.order_id
+    GROUP BY c.customer_id, c.first_name, c.last_name
+) t
+WHERE total_spent > avg_spent
+-- WRONG... CALCS AVERAGE ORDER SPEND NOT AVERAGE CUSTOMER SPEND
+
+-- Correct result not using CTEs
+SELECT c.first_name, c.last_name, SUM(oi.unit_price*oi.quantity) as total_customer_spend
+FROM orders o
+    JOIN customers c
+        ON c.customer_id = o.customer_id
+    JOIN order_items oi
+        ON oi.order_id = o.order_id
+GROUP BY c.customer_id
+HAVING SUM(oi.unit_price*oi.quantity) >
+    (SELECT AVG(tcs.total_customer_spend)
+    FROM (
+        SELECT SUM(oi.unit_price*oi.quantity) as total_customer_spend
+        FROM orders o
+            JOIN customers c
+                ON c.customer_id = o.customer_id
+            JOIN order_items oi
+                ON oi.order_id = o.order_id
+        GROUP BY c.customer_id
+    ) tcs)
+
+
+
 
 -- 17. Show the most recent order for each customer (using a subquery or DISTINCT ON).
+SELECT * FROM orders
+
 -- 18. List customers who have ordered more than one distinct product category.
 -- 19. Find all customers who have never placed an order.
 -- 20. Using a CTE, calculate each customer’s total spend and average order value.
