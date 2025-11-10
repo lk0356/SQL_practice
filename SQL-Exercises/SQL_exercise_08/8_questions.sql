@@ -203,6 +203,7 @@ FROM orders_values osv
         ON osv.customer_id = c.customer_id
         CROSS JOIN average_order_value aov
 WHERE osv.orders_total > aov.average_order_value
+-- WRONG... CALCS AVERAGE ORDER SPEND NOT AVERAGE CUSTOMER SPEND
 
 SELECT *
 FROM (
@@ -218,7 +219,6 @@ FROM (
     GROUP BY c.customer_id, c.first_name, c.last_name
 ) t
 WHERE total_spent > avg_spent
--- WRONG... CALCS AVERAGE ORDER SPEND NOT AVERAGE CUSTOMER SPEND
 
 -- Correct result not using CTEs
 SELECT c.first_name, c.last_name, SUM(oi.unit_price*oi.quantity) as total_customer_spend
@@ -244,10 +244,49 @@ HAVING SUM(oi.unit_price*oi.quantity) >
 
 
 -- 17. Show the most recent order for each customer (using a subquery or DISTINCT ON).
-SELECT * FROM orders
+SELECT mo.*, o.*, c.*
+FROM (
+    SELECT MAX(order_date) AS recent_order, customer_id
+    FROM orders
+    GROUP BY customer_id
+    ) mo
+    JOIN orders o
+        ON o.customer_id = mo.customer_id
+        AND o.order_date = mo.recent_order
+    JOIN customers c
+        ON c.customer_id = o.customer_id
+
+-- using the distinct on postgres approach
+SELECT *
+FROM (
+    SELECT
+        DISTINCT ON (customer_id)
+        customer_id,
+        MAX(order_date) AS recent_order
+    FROM orders
+    GROUP BY customer_id
+    ) mo
+    JOIN orders o
+        ON o.customer_id = mo.customer_id
+        AND o.order_date = mo.recent_order
+    JOIN customers c
+        ON c.customer_id = o.customer_id
 
 -- 18. List customers who have ordered more than one distinct product category.
+
 -- 19. Find all customers who have never placed an order.
+-- creating customer with no orders to make this work
+--INSERT INTO customers values (8, 'John', 'Maxwell', 'jmwell@hotmail.com', '0123454', 'London', 'UK', '2023-02-13')
+
+SELECT c.customer_id, c.first_name, c.last_name
+FROM customers c
+WHERE c.customer_id NOT IN (
+    SELECT c.customer_id
+    FROM customers c
+        JOIN orders o
+            ON c.customer_id = o.customer_id
+    )
+
 -- 20. Using a CTE, calculate each customer’s total spend and average order value.
 
 -- =====================
