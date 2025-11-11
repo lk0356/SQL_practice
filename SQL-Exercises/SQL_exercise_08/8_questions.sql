@@ -288,12 +288,48 @@ WHERE c.customer_id NOT IN (
     )
 
 -- 20. Using a CTE, calculate each customer’s total spend and average order value.
+-- did the average order value in general rather than customer specific avg order value
+WITH 
+    total_order_value AS 
+    (
+        SELECT SUM(quantity*unit_price) AS order_total, order_id
+        FROM order_items
+        GROUP BY order_id
+    ),
+    average_order_value AS 
+    (
+        SELECT AVG(order_total) AS average_order_total
+        FROM total_order_value
+    )
+
+SELECT 
+    SUM(order_total) AS customer_total_spend,
+    c.customer_id, 
+    c.first_name, 
+    c.last_name, 
+    average_order_value.average_order_total
+FROM orders o
+    JOIN customers c
+        ON c.customer_id = o.customer_id
+    JOIN total_order_value tov
+        ON o.order_id = tov.order_id
+    CROSS JOIN average_order_value
+GROUP BY c.customer_id, average_order_value.average_order_total
+
 
 -- =====================
 -- LEVEL 5 — Analytical & Window Functions
 -- =====================
 
 -- 21. Rank customers by total revenue, from highest to lowest.
+SELECT *
+FROM orders o
+    JOIN customers c
+        ON c.customer_id = o.customer_id
+    JOIN order_items oi
+        ON o.order_id = oi.order_id
+HAVING 
+
 -- 22. Within each country, rank customers by their total revenue.
 -- 23. Compute a running total of revenue over time (by order_date).
 -- 24. For each product, show its revenue and the percent of total company revenue it represents.
