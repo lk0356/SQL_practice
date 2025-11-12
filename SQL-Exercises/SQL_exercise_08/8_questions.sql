@@ -322,17 +322,88 @@ GROUP BY c.customer_id, average_order_value.average_order_total
 -- =====================
 
 -- 21. Rank customers by total revenue, from highest to lowest.
-SELECT *
+SELECT 
+    c.customer_id, 
+    c.first_name,
+    c.last_name,
+    SUM(oi.unit_price*oi.quantity) AS sum_price_quantity,
+    RANK() OVER (ORDER BY SUM(oi.unit_price * oi.quantity) DESC) AS revenue_rank
 FROM orders o
     JOIN customers c
         ON c.customer_id = o.customer_id
     JOIN order_items oi
         ON o.order_id = oi.order_id
-HAVING 
+GROUP BY c.customer_id
+ORDER BY sum_price_quantity DESC
 
 -- 22. Within each country, rank customers by their total revenue.
+SELECT 
+    c.customer_id, 
+    c.first_name,
+    c.last_name,
+    c.country,
+    SUM(oi.unit_price*oi.quantity) AS total_revenue,
+    RANK() OVER (PARTITION BY c.country ORDER BY SUM(oi.unit_price * oi.quantity) DESC) AS revenue_rank
+FROM orders o
+    JOIN customers c
+        ON c.customer_id = o.customer_id
+    JOIN order_items oi
+        ON o.order_id = oi.order_id
+GROUP BY c.customer_id
+ORDER BY total_revenue DESC
+
 -- 23. Compute a running total of revenue over time (by order_date).
+
+SELECT 
+    o.order_id,
+    o.order_date,
+    SUM(oi.unit_price * oi.quantity) OVER (ORDER BY o.order_date) AS total_revenue_over_time
+FROM orders o
+JOIN order_items oi
+    ON oi.order_id = o.order_id
+ORDER BY o.order_date;
+-- first attempt, captures data but has extra rows
+
+WITH order_totals AS (
+    SELECT 
+        o.order_id,
+        o.order_date,
+        SUM(oi.unit_price * oi.quantity) AS order_revenue
+    FROM orders o
+    JOIN order_items oi
+        ON oi.order_id = o.order_id
+    GROUP BY o.order_id, o.order_date
+)
+SELECT
+    SUM(ot.order_revenue) OVER (ORDER BY ot.order_date) AS total_revenue_over_time,
+    ot.order_id,
+    ot.order_date
+FROM order_totals ot
+
 -- 24. For each product, show its revenue and the percent of total company revenue it represents.
+WITH
+    total_product_revenue AS (
+        SELECT
+            SUM(oi.quantity * oi.unit_price) AS total_order_revenue,
+            p.product_id
+        FROM order_items oi
+            JOIN products p
+                ON oi.product_id = p.product_id
+        GROUP BY p.product_id
+    ),
+    total_company_revenue AS (
+        SELECT
+            SUM(quantity * unit_price) AS total_revenue
+        FROM order_items
+    )
+SELECT
+    tpr.total_order_revenue,
+    tpr.product_id,
+    tcr.total_revenue,
+    ROUND((tpr.total_order_revenue/tcr.total_revenue*100),1) AS percentage_of_company_revenue
+FROM total_product_revenue tpr
+    CROSS JOIN total_company_revenue tcr
+
 -- 25. For each customer, list each order along with their average order value and difference from that average.
 
 -- =====================
