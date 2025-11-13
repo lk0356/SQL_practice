@@ -102,3 +102,59 @@ INSERT INTO order_items (order_id, product_id, quantity, unit_price) VALUES
 -- Order 7 (Ethan)
 (7, 6, 1, 149.99),
 (7, 5, 2, 39.99);
+
+
+-- ============================================================
+-- ADDITIONAL DATA
+-- ============================================================
+INSERT INTO customers (first_name, last_name, email, phone, city, country, signup_date) VALUES
+('Fiona', 'Adams', 'fiona.adams@example.com', '555-6789', 'Dublin', 'Ireland', '2023-06-18'),
+('George', 'Hernandez', 'george.hernandez@example.com', '555-7890', 'San Francisco', 'USA', '2023-07-09'),
+('Hannah', 'Khan', 'hannah.khan@example.com', '555-8901', 'Auckland', 'New Zealand', '2023-07-30'),
+('Ivan', 'Petrov', 'ivan.petrov@example.com', '555-9012', 'Berlin', 'Germany', '2023-08-12'),
+('Julia', 'Rossi', 'julia.rossi@example.com', '555-0123', 'Rome', 'Italy', '2023-09-05');
+
+INSERT INTO products (product_name, category, price, stock_quantity) VALUES
+('Portable SSD 1TB', 'Electronics', 129.99, 75),
+('Gaming Chair', 'Furniture', 199.99, 40),
+('Smart LED Strip', 'Home Appliances', 24.99, 180),
+('USB-C Charging Cable', 'Electronics', 9.99, 600),
+('Notebook Set (5-pack)', 'Office Supplies', 7.99, 300);
+
+INSERT INTO orders (customer_id, order_date, status, shipping_city, shipping_country) VALUES
+(6, '2023-10-10 15:30:00', 'Shipped', 'Dublin', 'Ireland'),
+(7, '2023-10-12 09:50:00', 'Delivered', 'San Francisco', 'USA'),
+(8, '2023-10-14 20:10:00', 'Pending', 'Auckland', 'New Zealand'),
+(9, '2023-10-18 12:25:00', 'Delivered', 'Berlin', 'Germany'),
+(10, '2023-10-22 08:40:00', 'Shipped', 'Rome', 'Italy'),
+(7, '2023-11-01 17:05:00', 'Delivered', 'San Francisco', 'USA'),
+(6, '2023-11-04 10:10:00', 'Cancelled', 'Dublin', 'Ireland');
+
+INSERT INTO order_items (order_id, product_id, quantity, unit_price) VALUES
+-- Order 8 (Fiona)
+(8, 8, 1, 129.99),
+(8, 10, 2, 24.99),
+
+-- Order 9 (George)
+(9, 11, 1, 9.99),
+(9, 12, 1, 7.99),
+
+-- Order 10 (Hannah - pending)
+(10, 9, 1, 199.99),
+(10, 4, 1, 79.99),
+
+-- Order 11 (Ivan)
+(11, 2, 1, 89.99),
+(11, 6, 1, 149.99),
+(11, 10, 3, 24.99),
+
+-- Order 12 (Julia)
+(12, 3, 1, 199.99),
+(12, 8, 1, 129.99),
+
+-- Order 13 (George again)
+(13, 1, 2, 25.99),
+(13, 11, 3, 9.99),
+
+-- Order 14 (Fiona - cancelled)
+(14, 7, 1, 45.99);
