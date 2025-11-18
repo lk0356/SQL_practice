@@ -28,7 +28,9 @@ FROM customers c
 GROUP BY c.customer_id
 
 -- 6. Calculate the total revenue from all order items (quantity * unit_price).
-SELECT ...
+SELECT SUM(quantity * unit_price) AS total_revenue
+FROM order_items
+
 
 -- 7. Select each order with the total number of items in the order.
 SELECT ...
