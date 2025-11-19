@@ -33,7 +33,15 @@ FROM order_items
 
 
 -- 7. Select each order with the total number of items in the order.
-SELECT ...
+SELECT 
+    o.order_id,
+    SUM(oi.quantity) AS total_items
+FROM orders o
+    JOIN order_items oi
+        ON o.order_id = oi.order_id
+GROUP BY o.order_id
+
+
 
 -- 8. Select all products that have never been ordered.
 SELECT ...
