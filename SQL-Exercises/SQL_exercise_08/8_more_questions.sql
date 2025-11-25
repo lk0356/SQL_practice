@@ -44,10 +44,25 @@ GROUP BY o.order_id
 
 
 -- 8. Select all products that have never been ordered.
-SELECT ...
+SELECT p.*
+FROM products p
+LEFT JOIN order_items oi
+    ON p.product_id = oi.product_id
+WHERE oi.product_id IS NULL
+
 
 -- 9. Select the top 5 customers by total order value.
-SELECT ...
+SELECT 
+    c.customer_id,
+    SUM(oi.quantity * oi.unit_price) AS total_order_value
+FROM customers c
+    JOIN orders o
+        ON c.customer_id = o.customer_id
+    JOIN order_items oi
+        ON o.order_id = oi.order_id
+GROUP BY c.customer_id
+ORDER BY total_order_value DESC
+LIMIT 5;
 
 -- 10. Select all pending orders and include customer name and email.
 SELECT ...
